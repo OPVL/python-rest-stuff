@@ -1,1 +1,5 @@
 venv/
+*pycache*
+*.pyc
+*.log
+*.db
