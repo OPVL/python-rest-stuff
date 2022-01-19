@@ -1,0 +1,38 @@
+{
+    "python.pythonPath": "venv/bin/python",
+    "python.formatting.provider": "autopep8",
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true,
+    "python.linting.flake8Args": ["--max-line-length", "120"],
+    "python.autoComplete.extraPaths": [
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/",
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/google/",
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/google/appengine/",
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/google/appengine/ext/",
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/lib/",
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/lib/flask-0.12/"
+    ],
+    "python.autoComplete.addBrackets": true,
+    "editor.tabSize": 4,
+    "python.testing.unittestArgs": [
+      "-v",
+      "-s",
+      "./test",
+      "-p",
+      "*_test.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.extraPaths": [
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/",
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/google/",
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/google/appengine/",
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/google/appengine/ext/",
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/lib/",
+      "${env:HOME}/google-cloud-sdk/platform/google_appengine/lib/flask-0.12/"
+    ],
+    "python.analysis.completeFunctionParens": true
+  }
+  
