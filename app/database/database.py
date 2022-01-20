@@ -19,7 +19,7 @@ class Database:
 
         return self._cursor.fetchone()[0] == 1
 
-    def _insert(self, table: str, data: dict, commit=True):
+    def _insert(self, table: str, data: dict, commit=True) -> bool:
         columns = ",".join(data.keys())
         values = ",".join(f"'{value}'" for value in data.values())
         query = f'INSERT INTO {table}({columns}) VALUES({values})'
@@ -33,7 +33,7 @@ class Database:
 
         return self._cursor.lastrowid > 0
 
-    def _insert_many(self, table: str, rows: list, commit=True):
+    def _insert_many(self, table: str, rows: list, commit=True) -> bool:
         values = []
         for row in rows:
             values.append(
@@ -58,7 +58,7 @@ class Database:
                 order_by: str = None,
                 limit: int = None,
                 offset: int = None
-                ):
+                ) -> list:
         query = f'SELECT {columns} FROM {table};'
         if where:
             query = query.replace(';', f' {where};')
@@ -74,7 +74,7 @@ class Database:
 
         return rows
 
-    def _create_table(self, name: str, schema: dict, safe: bool = True, commit: bool = True):
+    def _create_table(self, name: str, schema: dict, safe: bool = True, commit: bool = True) -> bool:
         parsed_schema = self._parse_schema(schema)
         query = f'CREATE TABLE {"IF NOT EXISTS " if safe else ""}{name} ({parsed_schema});'
 
@@ -89,7 +89,7 @@ class Database:
     def _parse_schema(self, schema: dict) -> str:
         return ', '.join(f'{key} {value}' for key, value in schema.items())
 
-    def _drop(self, table: str, safe: bool = True, commit: bool = True):
+    def _drop(self, table: str, safe: bool = True, commit: bool = True) -> bool:
 
         query = f'DROP TABLE {"IF EXISTS " if safe else ""}{table};'
         logging.debug(msg=f'QUERY: {query}')
@@ -100,48 +100,21 @@ class Database:
 
         return not self.table_exists(table)
 
-    def _delete(self, table: str, where: str = '', commit: bool = True):
+    def _delete(self, table: str, where: str = '', commit: bool = True) -> int:
         # delete all rows from table
         where = f'DELETE FROM {table} {where};'
         logging.debug(f'QUERY: {where}')
         self._cursor.execute(where)
 
-        print('deleted', self._cursor.rowcount, 'records from the table.')
-
         if commit:
             self._db.commit()
+
+        return self._cursor.rowcount
 
 
 def main():
     logging.basicConfig(filename='database.log',
                         level=logging.DEBUG, format='%(asctime)s %(message)s')
-
-    database = Database(':memory:')
-    table_name = 'test_insertion'
-    schema = {
-        'id': 'integer',
-        'name': 'string'
-    }
-    offset = 1
-    data = [
-        {
-            'id': 1,
-            'name': 'jeffrey epstein'
-        }, {
-            'id': 2,
-            'name': 'didnt kill himself'
-        }, {
-            'id': 3,
-            'name': 'childish'
-        },
-        {
-            'id': 4,
-            'name': 'secure'
-        }
-    ]
-
-    database._create_table(name=table_name, schema=schema)
-    database._insert_many(table=table_name, rows=data)
 
 
 if __name__ == '__main__':

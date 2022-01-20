@@ -15,87 +15,93 @@ class DatabaseTest(TestCase):
             format='%(asctime)s %(message)s'
         )
 
+        self.database = Database(self._database)
+
     def test_can_create_table(self):
-        database = Database(self._database)
+
         table_name = 'test_creation'
         schema = {
             'id': 'integer',
             'name': 'string'
         }
 
-        self.assertTrue(database._create_table(name=table_name, schema=schema))
-        self.assertTrue(database.table_exists(table=table_name))
+        self.assertTrue(self.database._create_table(
+            name=table_name, schema=schema))
+        self.assertTrue(self.database.table_exists(table=table_name))
 
     def test_safe_handle_duplicate_table_creation(self):
-        database = Database(self._database)
+
         table_name = 'test_creation'
         schema = {
             'id': 'integer',
             'name': 'string'
         }
 
-        self.assertTrue(database._create_table(
+        self.assertTrue(self.database._create_table(
             name=table_name, schema=schema, safe=False))
-        self.assertTrue(database.table_exists(table=table_name))
+        self.assertTrue(self.database.table_exists(table=table_name))
 
-        self.assertTrue(database._create_table(
+        self.assertTrue(self.database._create_table(
             name=table_name, schema=schema, safe=True))
 
     def test_can_drop_table(self):
-        database = Database(self._database)
+
         table_name = 'test_destroy'
         schema = {
             'id': 'integer',
             'name': 'string'
         }
 
-        database._create_table(name=table_name, schema=schema)
-        self.assertTrue(database.table_exists(table=table_name))
+        self.database._create_table(name=table_name, schema=schema)
+        self.assertTrue(self.database.table_exists(table=table_name))
 
-        database._drop(table=table_name, safe=False)
-        self.assertFalse(database.table_exists(table=table_name))
+        self.database._drop(table=table_name, safe=False)
+        self.assertFalse(self.database.table_exists(table=table_name))
 
     def test_can_safely_drop_nonexistent_table(self):
-        database = Database(self._database)
+
         table_name = 'test_destroy_nonexistent'
 
-        self.assertFalse(database.table_exists(table=table_name))
+        self.assertFalse(self.database.table_exists(table=table_name))
 
-        database._drop(table=table_name, safe=True)
+        self.database._drop(table=table_name, safe=True)
 
     def test_can_insert_data(self):
-        database = Database(self._database)
+
         table_name = 'test_insertion'
         schema = {
             'id': 'integer',
             'name': 'string'
         }
 
-        self.assertTrue(database._create_table(name=table_name, schema=schema))
+        self.assertTrue(self.database._create_table(
+            name=table_name, schema=schema))
 
-        database._insert(table=table_name, data={
+        self.database._insert(table=table_name, data={
             'id': id(self),
             'name': table_name
         })
 
-        rows = database._cursor.execute(f'''SELECT * FROM {table_name};''')
+        rows = self.database._cursor.execute(
+            f'''SELECT * FROM {table_name};''')
         row_list = rows.fetchall()
 
         self.assertEquals(1, rows.arraysize)
-        self.assertEquals(1, database._cursor.lastrowid)
+        self.assertEquals(1, self.database._cursor.lastrowid)
 
         self.assertEquals(id(self), row_list[0][0])
         self.assertEquals(table_name, row_list[0][1])
 
     def test_can_insert_many(self):
-        database = Database(self._database)
+
         table_name = 'test_insertion'
         schema = {
             'id': 'integer',
             'name': 'string'
         }
 
-        self.assertTrue(database._create_table(name=table_name, schema=schema))
+        self.assertTrue(self.database._create_table(
+            name=table_name, schema=schema))
 
         data = [
             {
@@ -110,12 +116,13 @@ class DatabaseTest(TestCase):
             }
         ]
 
-        database._insert_many(table=table_name, rows=data)
+        self.database._insert_many(table=table_name, rows=data)
 
-        rows = database._cursor.execute(f'''SELECT * FROM {table_name};''')
+        rows = self.database._cursor.execute(
+            f'''SELECT * FROM {table_name};''')
         row_list = rows.fetchall()
 
-        self.assertEquals(3, database._cursor.lastrowid)
+        self.assertEquals(3, self.database._cursor.lastrowid)
         self.assertEquals(3, len(row_list))
 
         for iterator in range(0, len(row_list)):
@@ -123,35 +130,37 @@ class DatabaseTest(TestCase):
             self.assertEquals(data[iterator]['name'], row_list[iterator][1])
 
     def test_can_get_data(self):
-        database = Database(self._database)
+
         table_name = 'test_selection'
         schema = {
             'id': 'integer',
             'name': 'string'
         }
 
-        self.assertTrue(database._create_table(name=table_name, schema=schema))
+        self.assertTrue(self.database._create_table(
+            name=table_name, schema=schema))
 
-        database._insert(table=table_name, data={
+        self.database._insert(table=table_name, data={
             'id': id(self),
             'name': table_name
         })
 
-        rows = database._select(columns='*', table=table_name)
+        rows = self.database._select(columns='*', table=table_name)
         row_list = rows.fetchall()
 
         self.assertEquals(id(self), row_list[0][0])
         self.assertEquals(table_name, row_list[0][1])
 
     def test_can_get_data_with_condition(self):
-        database = Database(self._database)
+
         table_name = 'test_selection'
         schema = {
             'id': 'integer',
             'name': 'string'
         }
 
-        self.assertTrue(database._create_table(name=table_name, schema=schema))
+        self.assertTrue(self.database._create_table(
+            name=table_name, schema=schema))
 
         data = [
             {
@@ -166,10 +175,10 @@ class DatabaseTest(TestCase):
             }
         ]
 
-        database._insert_many(table=table_name, rows=data)
+        self.database._insert_many(table=table_name, rows=data)
 
-        rows = database._select(columns='*', table=table_name,
-                                where=f"WHERE id = {data[0]['id']}")
+        rows = self.database._select(columns='*', table=table_name,
+                                     where=f"WHERE id = {data[0]['id']}")
         row_list = rows.fetchall()
 
         self.assertEquals(1, len(row_list))
@@ -177,14 +186,15 @@ class DatabaseTest(TestCase):
         self.assertEquals(data[0]['name'], row_list[0][1])
 
     def test_can_get_ordered_data(self):
-        database = Database(self._database)
+
         table_name = 'test_selection'
         schema = {
             'id': 'integer',
             'name': 'string'
         }
 
-        self.assertTrue(database._create_table(name=table_name, schema=schema))
+        self.assertTrue(self.database._create_table(
+            name=table_name, schema=schema))
 
         data = [
             {
@@ -199,10 +209,10 @@ class DatabaseTest(TestCase):
             }
         ]
 
-        database._insert_many(table=table_name, rows=data)
+        self.database._insert_many(table=table_name, rows=data)
 
-        rows = database._select(columns='*', table=table_name,
-                                order_by="id DESC")
+        rows = self.database._select(columns='*', table=table_name,
+                                     order_by="id DESC")
         row_list = rows.fetchall()
 
         self.assertEquals(3, len(row_list))
@@ -210,14 +220,15 @@ class DatabaseTest(TestCase):
         self.assertEquals(data[2]['name'], row_list[0][1])
 
     def test_can_get_data_with_limit(self):
-        database = Database(self._database)
+
         table_name = 'test_selection'
         schema = {
             'id': 'integer',
             'name': 'string'
         }
 
-        self.assertTrue(database._create_table(name=table_name, schema=schema))
+        self.assertTrue(self.database._create_table(
+            name=table_name, schema=schema))
 
         data = [
             {
@@ -232,10 +243,10 @@ class DatabaseTest(TestCase):
             }
         ]
 
-        database._insert_many(table=table_name, rows=data)
+        self.database._insert_many(table=table_name, rows=data)
 
-        rows = database._select(columns='*', table=table_name,
-                                limit=2, order_by='id ASC')
+        rows = self.database._select(columns='*', table=table_name,
+                                     limit=2, order_by='id ASC')
         row_list = rows.fetchall()
 
         self.assertEquals(2, len(row_list))
@@ -245,7 +256,7 @@ class DatabaseTest(TestCase):
             self.assertEquals(data[iterator]['name'], row_list[iterator][1])
 
     def test_can_get_data_with_offset(self):
-        database = Database(self._database)
+
         table_name = 'test_selection'
         schema = {
             'id': 'integer',
@@ -253,7 +264,8 @@ class DatabaseTest(TestCase):
         }
         offset = 1
 
-        self.assertTrue(database._create_table(name=table_name, schema=schema))
+        self.assertTrue(self.database._create_table(
+            name=table_name, schema=schema))
 
         data = [
             {
@@ -268,10 +280,10 @@ class DatabaseTest(TestCase):
             }
         ]
 
-        database._insert_many(table=table_name, rows=data)
+        self.database._insert_many(table=table_name, rows=data)
 
-        rows = database._select(columns='*', table=table_name,
-                                limit=5, offset=offset, order_by='id ASC')
+        rows = self.database._select(columns='*', table=table_name,
+                                     limit=5, offset=offset, order_by='id ASC')
         row_list = rows.fetchall()
 
         self.assertEquals(2, len(row_list))
@@ -283,14 +295,14 @@ class DatabaseTest(TestCase):
                               row_list[iterator - offset][1])
 
     def test_can_delete(self):
-        database = Database(self._database)
         table_name = 'test_insertion'
         schema = {
             'id': 'integer',
             'name': 'string'
         }
 
-        self.assertTrue(database._create_table(name=table_name, schema=schema))
+        self.assertTrue(self.database._create_table(
+            name=table_name, schema=schema))
 
         data = [
             {
@@ -305,27 +317,28 @@ class DatabaseTest(TestCase):
             }
         ]
 
-        database._insert_many(table=table_name, rows=data)
+        self.database._insert_many(table=table_name, rows=data)
 
-        rows = database._select(table=table_name)
+        rows = self.database._select(table=table_name)
         row_list = rows.fetchall()
         self.assertEquals(3, len(row_list))
 
-        database._delete(table=table_name)
+        self.assertEquals(3, self.database._delete(table=table_name))
 
-        rows = database._select(table=table_name)
+        rows = self.database._select(table=table_name)
         row_list = rows.fetchall()
         self.assertEquals(0, len(row_list))
 
     def test_can_delete_with_condition(self):
-        database = Database(self._database)
+
         table_name = 'test_insertion'
         schema = {
             'id': 'integer',
             'name': 'string'
         }
 
-        self.assertTrue(database._create_table(name=table_name, schema=schema))
+        self.assertTrue(self.database._create_table(
+            name=table_name, schema=schema))
 
         data = [
             {
@@ -340,9 +353,11 @@ class DatabaseTest(TestCase):
             }
         ]
 
-        database._insert_many(table=table_name, rows=data)
-        database._delete(table=table_name, where=f"WHERE id != {data[0]['id']}")
-        rows = database._select(table=table_name)
+        self.database._insert_many(table=table_name, rows=data)
+        self.assertEquals(2, self.database._delete(
+            table=table_name, where=f"WHERE id != {data[0]['id']}"))
+
+        rows = self.database._select(table=table_name)
         row_list = rows.fetchall()
         self.assertEquals(1, len(row_list))
 
