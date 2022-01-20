@@ -1,7 +1,6 @@
 
 import logging
 import sqlite3
-from time import time
 
 
 class Database:

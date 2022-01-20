@@ -8,6 +8,7 @@ from app.database.credentials import Credentials
 class CredentialsTest(TestCase):
     def __init__(self, methodName: str = ...) -> None:
         super().__init__(methodName)
+
         logging.basicConfig(
             filename='test.log',
             level=logging.DEBUG,
