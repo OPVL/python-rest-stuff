@@ -1,7 +1,7 @@
 import logging
 from unittest import TestCase
 
-from app.database.database import Database
+from src.database.database import Database
 
 
 class DatabaseTest(TestCase):

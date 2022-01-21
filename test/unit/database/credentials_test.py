@@ -2,7 +2,7 @@ import logging
 from time import time
 from unittest import TestCase
 
-from app.database.credentials import Credentials
+from src.database.credentials import Credentials
 
 
 class CredentialsTest(TestCase):

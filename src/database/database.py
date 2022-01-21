@@ -4,11 +4,14 @@ import sqlite3
 
 
 class Database:
-    _filename = 'app/database/vulture.db'
+    _filename = 'src/database/vulture.db'
 
     def __init__(self, database: str = None) -> None:
         self._db = sqlite3.connect(database if database else self._filename)
         self._cursor = self._db.cursor()
+
+        logging.basicConfig(filename='database.log',
+                            level=logging.DEBUG, format='%(asctime)s %(message)s')
 
     def table_exists(self, table: str) -> bool:
         query = f"SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{table}'"

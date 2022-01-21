@@ -11,6 +11,7 @@ def config() -> dict:
         'client_secret': '2c770bd5ca7747118c505145603448b0',
         'app_name': 'vulture',
         'auth_url': 'https://accounts.spotify.com/api/token',
+        'redirect': 'http://localhost:5000/authorize/spotify/return',
         'user': result.group() if result else 'demo'
     }
 

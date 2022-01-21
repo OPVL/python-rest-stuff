@@ -1,6 +1,6 @@
 import logging
 from time import time
-from app.database.database import Database
+from src.database.database import Database
 
 
 class Credentials(Database):
