@@ -23,7 +23,7 @@ class Database:
 
     def _insert(self, table: str, data: dict, commit=True) -> bool:
         columns = ",".join(data.keys())
-        values = ",".join(f"'{value}'" for value in data.values())
+        values = ",".join(f'''"{value}"''' for value in data.values())
         query = f'INSERT INTO {table}({columns}) VALUES({values})'
 
         logging.debug(f'QUERY: {query}')
@@ -112,6 +112,19 @@ class Database:
             self._db.commit()
 
         return self._cursor.rowcount
+
+    def _update(self, table: str, where: str, data: dict, commit: bool = True) -> int:
+
+        updates = ",".join(f"{col} = '{value}'" for col, value in data.items())
+        query = f'UPDATE {table} SET {updates} WHERE {where};'
+
+        logging.debug(f'QUERY: {query}')
+        self._cursor.execute(query)
+
+        if commit:
+            self._db.commit()
+
+        return self._cursor.lastrowid
 
 
 def main():
